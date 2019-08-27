@@ -1,0 +1,61 @@
+{
+  "name": "swagger-generator-koa",
+  "title": "swagger-generator-koa",
+  "version": "1.0.0",
+  "description": "Generate automatic swagger using joi validation.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "build": "tsc",
+  "build:watch": "tsc --watch",
+  "prepublish": "tsc",
+  "scripts": {
+    "lint": "tslint --project \"./tsconfig.json\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "systango-technologies",
+    "email": "engineering@systango.com"
+  },
+  "homepage": "https://github.com/SystangoTechnologies/swagger-generator-koa/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SystangoTechnologies/swagger-generator-koa"
+  },
+  "keywords": [
+    "swagger",
+    "koa",
+    "ui",
+    "json",
+    "joi",
+    "auto",
+    "automatic",
+    "documentation",
+    "openapi"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "systango-technologies",
+      "email": "engineering@systango.com"
+    }
+  ],
+  "dependencies": {
+    "@types/joi": "^14.3.3",
+    "@types/koa-convert": "^1.2.2",
+    "@types/koa-mount": "^4.0.0",
+    "joi": "^14.3.1",
+    "joi-to-swagger": "^3.2.0",
+    "koa-convert": "^1.2.0",
+    "koa-mount": "^4.0.0",
+    "koa-static": "^5.0.0",
+    "lodash": "^4.17.15",
+    "swagger-spec-express": "^2.0.18",
+    "swagger-ui-koa": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^12.7.1",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  }
+}

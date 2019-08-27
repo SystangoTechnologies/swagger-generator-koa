@@ -1,0 +1,40 @@
+{
+  "name": "koa-swagger-example",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./index.js",
+    "test": "./node_modules/mocha/bin/_mocha ./test/**/*.test.js"
+  },
+  "keywords": [],
+  "author": "Vikas Patidar",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "4.1.1",
+    "chai-http": "^3.0.0",
+    "mocha": "3.5.0",
+    "sinon": "^4.1.5"
+  },
+  "dependencies": {
+    "@hapi/joi": "^15.1.1",
+    "bcryptjs": "^2.4.3",
+    "knex": "^0.13.0",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-passport": "^4.0.1",
+    "koa-redis": "^3.1.1",
+    "koa-router": "^7.2.1",
+    "koa-session": "^5.5.1",
+    "koa2-validation": "^1.0.0",
+    "mysql2": "^1.6.5",
+    "passport-local": "^1.0.0",
+    "pg": "^7.1.2",
+    "sequelize": "^5.15.1"
+  },
+  "maintainers": [
+    {
+      "name": "systango-technologies",
+      "email": "engineering@systango.com"
+    }
+  ]
+}
