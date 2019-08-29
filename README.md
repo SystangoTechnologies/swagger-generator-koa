@@ -2,6 +2,8 @@
 
 NPM module to generate swagger documentation for KOA APIs with minimum additional effort.
 
+>[![Downloads](https://badgen.net/npm/dt/swagger-generator-koa)](https://www.npmjs.com/package/swagger-generator-koa) [![npm dependents](https://badgen.net/npm/dependents/swagger-generator-koa)](https://www.npmjs.com/package/swagger-generator-koa?activeTab=dependents)
+
 ## Description
 This NPM module let's you generate swagger (OpenAPI) documentation for your KOA APIs without putting in much extra efforts. You just need to follow the convention for your request and response objects, and the module will take care of the rest. This module will cover your controllers, API specs along with request and response object structures.
 
