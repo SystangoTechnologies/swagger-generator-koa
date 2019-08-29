@@ -58,7 +58,7 @@ function serveSwagger(
   initialise(app, options);
   compile(); // compile swagger document
   app.use(swaggerUi.serve); // serve swagger static files
-  app.use(convert(mount(endPoint, swaggerUi.setup(json()))));
+  app.use(convert(mount(endPoint, swaggerUi.setup(json(), false, null, null, null))));
 }
 
 /**
