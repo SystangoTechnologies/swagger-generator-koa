@@ -5,7 +5,7 @@ NPM module to generate swagger documentation for KOA APIs with minimum additiona
 >[![Downloads](https://badgen.net/npm/dt/swagger-generator-koa)](https://www.npmjs.com/package/swagger-generator-koa) [![npm dependents](https://badgen.net/npm/dependents/swagger-generator-koa)](https://www.npmjs.com/package/swagger-generator-koa?activeTab=dependents)
 
 ## Description
-This NPM module let's you generate swagger (OpenAPI) documentation for your KOA APIs without putting in much extra efforts. You just need to follow the convention for your request and response objects, and the module will take care of the rest. This module will cover your controllers, API specs along with request and response object structures.
+This NPM module let's you validate and generate swagger (OpenAPI) documentation for your KOA APIs without putting in much extra efforts. You just need to follow the convention for your request and response objects, and the module will take care of the rest. This module will cover your controllers, API specs along with request and response object structures.
 
 
 ## Usage ##
@@ -64,7 +64,7 @@ swagger.serveSwagger(app, "/swagger", options, {routePath : './src/routes/', req
 const Router = require('koa-router');
 const router = new Router();
 const userController = require('../controller/user');
-const validation = require('koa2-validation');
+const {validation} = require('swagger-generator-koa');
 var requestModel = require('../requestModel/users');
 const BASE_URL = `/users`;
 
@@ -155,52 +155,119 @@ module.exports = {
 module.exports = {
     createUser: { // This name should be model name defined in request model.
         201: {
-            message: "User created successfully"
+            message: {
+                type: 'string'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
     getUsers: {
         200: [{
-            id: 'number',
-            firstName: 'string',
-            lastName: 'string',
-            address: 'string',
-            contact: 'number',
-            createdAt: 'date',
-            updatedAt: 'date'
+            id: {
+                type: 'number'
+            },
+            firstName: {
+                type: 'string'
+            },
+            lastName: {
+                type: 'string'
+            },
+            address: {
+                type: 'string'
+            },
+            contact: {
+                type: 'number'
+            },
+            createdAt: {
+                type: 'number',
+                format: 'date-time'
+            },
+            updatedAt: {
+                type: 'number',
+                format: 'date-time'
+            }
         }],
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
-    updateUser:{
+    updateUser: {
         201: {
-            message: "User Updated successfully"
+            message: {
+                type: 'string'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
     getUserDetails: {
         200: {
-            id: 'number',
-            firstName: 'string',
-            lastName: 'string',
-            address: 'string',
-            contact: 'number',
-            createdAt: 'date',
-            updatedAt: 'date'
+            id: {
+                type: 'number'
+            },
+            firstName: {
+                type: 'string'
+            },
+            lastName: {
+                type: 'string'
+            },
+            address: {
+                type: 'string'
+            },
+            contact: {
+                type: 'number'
+            },
+            createdAt: {
+                type: 'number',
+                format: 'date-time'
+            },
+            updatedAt: {
+                type: 'number',
+                format: 'date-time'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
 };
 ```
 
 Open `http://`<app_host>`:`<app_port>`/swagger` in your browser to view the documentation.
+
+# Version changes
+
+## v2.0.0
+
+#### Added Request Parameter Validation Function
+
+- Use `validation` function exported from this module to validate request params.
+
+```javascript
+'use strict';
+const Router = require('koa-router');
+const router = new Router();
+const userController = require('../controller/user');
+const {validation} = require('swagger-generator-koa');
+var requestModel = require('../requestModel/users');
+const BASE_URL = `/users`;
+
+router.post(`${BASE_URL}/`, validation(requestModel[0]), userController.createUser);
+
+module.exports = router;
+
+```
 
 ## Requirements
 

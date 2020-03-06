@@ -7,6 +7,7 @@ import { resolve, join } from 'path';
 import convert from 'koa-convert';
 import mount from 'koa-mount';
 import swaggerUi from 'swagger-ui-koa';
+import Validation from './validation/validate';
 
 /**
  * This module will support all the functionality of swagger-spec-express with additonal
@@ -19,7 +20,8 @@ export = {
   swaggerize,
   createModel,
   serveSwagger,
-  describeSwaggerWithoutPath
+  describeSwaggerWithoutPath,
+  validation: Validation
 };
 
 /**
@@ -28,7 +30,30 @@ export = {
  */
 
 function createResponseModel({ responseModel, name }: { responseModel: any; name: string }) {
-  const bodyParameter = j2s(responseModel).swagger;
+  let isArray = false;
+  if (responseModel && Array.isArray(responseModel) && responseModel.length) {
+    isArray = true;
+    responseModel = responseModel[0];
+  }
+  for (const property in responseModel) {
+    if (typeof responseModel[property] === 'string') {
+      responseModel[property] = {
+        type: responseModel[property],
+      };
+    }
+  }
+  const bodyParameter: any = {
+    type: isArray ? 'array' : 'object',
+  };
+
+  if (isArray) {
+    bodyParameter.items = {
+      type: 'object',
+      properties: responseModel,
+    };
+  } else {
+    bodyParameter.properties = responseModel;
+  }
   const model = Object.assign(
     {
       name,
@@ -48,7 +73,7 @@ function serveSwagger(
   app: any,
   endPoint: string,
   options: object,
-  path: { routePath: string; requestModelPath: string; responseModelPath: string },
+  path: { routePath?: string; requestModelPath: string; responseModelPath: string },
 ) {
   if (path.routePath) {
     describeSwagger(app, path.routePath, path.requestModelPath, path.responseModelPath);
@@ -73,24 +98,31 @@ function createResponses(schema: any, responseModel: any, describe: any) {
       description: responsesEnum[500],
     },
   };
-  if (responseModel && !isEmpty(responseModel)) {
-    for (const key in responseModel) {
-      if (responseModel.hasOwnProperty(key)) {
-        createResponseModel({
-          responseModel: responseModel[key],
-          name: `${schema.model}${key}ResponseModel`,
-        });
-        responses[key] = {
-          description: responsesEnum[key] ? responsesEnum[key] : '',
-          schema: {
-            $ref: `#/definitions/${schema.model}${key}ResponseModel`,
-          },
-        };
+  try {
+    if (responseModel && !isEmpty(responseModel)) {
+      for (const key in responseModel) {
+        if (responseModel.hasOwnProperty(key)) {
+          createResponseModel({
+            responseModel: responseModel[key],
+            name: `${schema.model}${key}ResponseModel`,
+          });
+          responses[key] = {
+            description: responsesEnum[key] ? responsesEnum[key] : '',
+            schema: {
+              $ref: `#/definitions/${schema.model}${key}ResponseModel`,
+            },
+          };
+        }
       }
     }
+    describe.responses = responses;
+    return describe;
+  } catch (error) {
+    console.log('responseModel', responseModel);
+    console.log('Error while generting response model for swagger', error);
+    describe.responses = responses;
+    return describe;
   }
-  describe.responses = responses;
-  return describe;
 }
 
 /**
@@ -107,7 +139,7 @@ function getHeader(schema: any, describe: any) {
       const query = schema[key];
       const queryObject = {
         name: key,
-        type: query._type ? query._type : query,
+        type: query.type ? query.type : query,
         required: query.required === 'undefined' ? false : true,
       };
       if (query._flags && query._flags.presence) {
@@ -144,7 +176,7 @@ function getQueryAndPathParamObj(schema: any, value: string, describe: any) {
 
       const queryObject = {
         name: key,
-        type: query._type ? query._type : query,
+        type: query.type ? query.type : query,
         required: query.required === 'undefined' ? false : true,
       };
       if (query._flags && query._flags.presence) {
@@ -247,9 +279,9 @@ function createModel(schema: any, responseModel: { [x: string]: any; hasOwnPrope
 function describeSwagger(app: any, routePath: string, requestModelPath: string, responseModelPath: any) {
   try {
     app._router = {
-      stack: []
+      stack: [],
     };
-    const rootPath = resolve(__dirname).split('/node_modules')[0];
+    const rootPath = resolve(__dirname).split('node_modules')[0];
     fs.readdirSync(join(rootPath, routePath)).forEach((file: any) => {
       if (!file) {
         console.log('No router file found in given folder');
@@ -263,13 +295,21 @@ function describeSwagger(app: any, routePath: string, requestModelPath: string, 
         console.log('Router missing');
         return;
       }
-      const responseModelFullPath = join(rootPath, responseModelPath, file);
-      const requestModelFullPath = join(rootPath, requestModelPath, file);
-      if (fs.existsSync(requestModelFullPath)) {
-        requestModel = require(requestModelFullPath);
+      if (responseModelPath) {
+        const responseModelFullPath = join(rootPath, responseModelPath, file);
+        if (fs.existsSync(responseModelFullPath)) {
+          responseModel = require(responseModelFullPath);
+        } else {
+          console.log('Response model path does not exist responseModelFullPath->', responseModelFullPath);
+        }
       }
-      if (fs.existsSync(responseModelFullPath)) {
-        responseModel = require(responseModelFullPath);
+      if (requestModelPath) {
+        const requestModelFullPath = join(rootPath, requestModelPath, file);
+        if (fs.existsSync(requestModelFullPath)) {
+          requestModel = require(requestModelFullPath);
+        } else {
+          console.log('Response model path does not exist requestModelFullPath->', requestModelFullPath);
+        }
       }
       processRouter(app, router, requestModel, responseModel, file.split('.')[0]);
     });
@@ -350,8 +390,8 @@ function describeRouterRoute(router: any, metaData: any) {
   metaData.verb = verb.toLowerCase();
   router.swaggerData = metaData;
   router.route = {
-      swaggerData: metaData,
-      path: metaData.path
+    swaggerData: metaData,
+    path: metaData.path,
   };
   metaData.described = true;
 }
@@ -363,41 +403,52 @@ function describeRouterRoute(router: any, metaData: any) {
  */
 function describeSwaggerWithoutPath(app: any, requestModelPath: string, responseModelPath: string) {
   try {
-      app._router = {
-          stack: []
-      };
-      const rootPath = resolve(__dirname).split('/node_modules')[0];
-      app.middleware.forEach((middleware: any) => {
-          let responseModel;
-          let requestModel;
-          if (middleware.name !== 'dispatch') {
-              return;
-          }
-          if (!middleware.router || !middleware.router.stack) {
-              console.log('Router missing');
-              return;
-          }
-          const routerPrefix = get(middleware, ['router', 'opts', 'prefix']);
-          let routerBasePath;
-          if (routerPrefix) {
-              routerBasePath = routerPrefix.replace(/\//g, '');
-          }
-          if (!routerBasePath) {
-              routerBasePath = 'Home';
-          }
-          const responseModelFullPath = join(rootPath, responseModelPath, `${routerPrefix}.js`);
-          const requestModelFullPath = join(rootPath, requestModelPath, `${routerPrefix}.js`);
-          if (fs.existsSync(requestModelFullPath)) {
-              requestModel = require(requestModelFullPath);
-          }
-          if (fs.existsSync(responseModelFullPath)) {
-              responseModel = require(responseModelFullPath);
-          }
-          processRouter(app, middleware.router, requestModel, responseModel, routerBasePath);
-      });
+    app._router = {
+      stack: [],
+    };
+    const rootPath = resolve(__dirname).split('node_modules')[0];
+    app.middleware.forEach((middleware: any) => {
+      let responseModel;
+      let requestModel;
+      if (middleware.name !== 'dispatch') {
+        return;
+      }
+      if (!middleware.router || !middleware.router.stack) {
+        console.log('Router missing');
+        return;
+      }
+      const routerPrefix = get(middleware, ['router', 'opts', 'prefix']);
+      let routerBasePath;
+      if (routerPrefix) {
+        routerBasePath = routerPrefix.replace(/\//g, '');
+      }
+      if (!routerBasePath) {
+        routerBasePath = 'Home';
+      }
+
+      if (responseModelPath && routerPrefix) {
+        const responseModelFullPath = join(rootPath, responseModelPath, `${routerPrefix}.js`);
+        if (fs.existsSync(responseModelFullPath)) {
+          responseModel = require(responseModelFullPath);
+        } else {
+          console.log('Response model path does not exist responseModelFullPath->', responseModelFullPath);
+        }
+      }
+
+      if (requestModelPath && routerPrefix) {
+        const requestModelFullPath = join(rootPath, requestModelPath, `${routerPrefix}.js`);
+        if (fs.existsSync(requestModelFullPath)) {
+          requestModel = require(requestModelFullPath);
+        } else {
+          console.log('Response model path does not exist requestModelFullPath->', requestModelFullPath);
+        }
+      }
+
+      processRouter(app, middleware.router, requestModel, responseModel, routerBasePath);
+    });
   } catch (error) {
-      console.log(`Error in describeSwagger ${error}`);
-      return;
+    console.log(`Error in describeSwagger ${error}`);
+    return;
   }
 }
 

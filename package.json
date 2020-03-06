@@ -1,7 +1,7 @@
 {
   "name": "swagger-generator-koa",
   "title": "swagger-generator-koa",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Generate automatic swagger using joi validation.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -40,20 +40,22 @@
     }
   ],
   "dependencies": {
+    "@hapi/joi": "^17.1.0",
+    "@types/hapi__joi": "^16.0.11",
     "@types/joi": "^14.3.3",
     "@types/koa-convert": "^1.2.2",
     "@types/koa-mount": "^4.0.0",
     "joi": "^14.3.1",
-    "joi-to-swagger": "^3.2.0",
+    "joi-to-swagger": "^4.0.0",
     "koa-convert": "^1.2.0",
     "koa-mount": "^4.0.0",
     "koa-static": "^5.0.0",
     "lodash": "^4.17.15",
-    "swagger-spec-express": "^2.0.19",
+    "swagger-spec-express": "^2.0.23",
     "swagger-ui-koa": "0.0.1"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.138",
+    "@types/lodash": "^4.14.149",
     "@types/node": "^12.7.2",
     "tslint": "^5.19.0",
     "typescript": "^3.5.3"
@@ -63,6 +65,10 @@
     "dist/index.d.ts",
     "dist/responsesEnum.js",
     "dist/responsesEnum.d.ts",
+    "dist/validation/validate.d.ts",
+    "dist/validation/validate.js",
+    "dist/validation/validation-error.d.ts",
+    "dist/validation/validation-error.js",
     "README.md"
   ]
 }

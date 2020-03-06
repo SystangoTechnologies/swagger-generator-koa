@@ -3,46 +3,90 @@
 module.exports = {
     createUser: {
         201: {
-            message: "User created successfully"
+            message: {
+                type: 'string'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
     getUsers: {
         200: [{
-            id: 'number',
-            firstName: 'string',
-            lastName: 'string',
-            address: 'string',
-            contact: 'number',
-            createdAt: 'date',
-            updatedAt: 'date'
+            id: {
+                type: 'number'
+            },
+            firstName: {
+                type: 'string'
+            },
+            lastName: {
+                type: 'string'
+            },
+            address: {
+                type: 'string'
+            },
+            contact: {
+                type: 'number'
+            },
+            createdAt: {
+                type: 'number',
+                format: 'date-time'
+            },
+            updatedAt: {
+                type: 'number',
+                format: 'date-time'
+            }
         }],
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
-    updateUser:{
+    updateUser: {
         201: {
-            message: "User Updated successfully"
+            message: {
+                type: 'string'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
     getUserDetails: {
         200: {
-            id: 'number',
-            firstName: 'string',
-            lastName: 'string',
-            address: 'string',
-            contact: 'number',
-            createdAt: 'date',
-            updatedAt: 'date'
+            id: {
+                type: 'number'
+            },
+            firstName: {
+                type: 'string'
+            },
+            lastName: {
+                type: 'string'
+            },
+            address: {
+                type: 'string'
+            },
+            contact: {
+                type: 'number'
+            },
+            createdAt: {
+                type: 'number',
+                format: 'date-time'
+            },
+            updatedAt: {
+                type: 'number',
+                format: 'date-time'
+            }
         },
         500: {
-            internal: "Server Error"
+            internal: {
+                type: 'string'
+            }
         }
     },
 };

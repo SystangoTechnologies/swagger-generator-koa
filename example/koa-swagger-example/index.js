@@ -2,7 +2,7 @@ const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const indexRoutes = require('./src/routes/index');
 const userRoutes = require('./src/routes/users');
-const swagger = require('../swagger-generator-koa');
+const swagger = require('swagger-generator-koa');
 
 const app = new Koa();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +19,7 @@ app.use(async (ctx, next) => {
 	  ctx.body = {
 		success: false,
 		message: err.message,
+		errors: err.errors
 	  };
 	}
 });
@@ -52,6 +53,6 @@ const options = {
 };
 
 
-swagger.serveSwagger(app, "/swagger", options, {routePath : '../../koa-swagger-example/src/routes', requestModelPath: '../../koa-swagger-example/src/requestModel', responseModelPath: '../../koa-swagger-example/src/responseModel'});
+swagger.serveSwagger(app, "/swagger", options, {routePath : './src/routes', requestModelPath: './src/requestModel', responseModelPath: './src/responseModel'});
 
 module.exports = server;

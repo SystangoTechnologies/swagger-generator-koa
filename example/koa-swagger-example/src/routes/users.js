@@ -1,7 +1,9 @@
+'use strict';
+
 const Router = require('koa-router');
 const router = new Router();
 const userController = require('../controller/user');
-const validation = require('koa2-validation');
+const {validation} = require('swagger-generator-koa');
 var requestModel = require('../requestModel/users');
 const BASE_URL = `/users`;
 
